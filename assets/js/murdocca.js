@@ -20,10 +20,25 @@ function load(id) {
 		load(goback)
 	})
 
-	let html = `<img src="assets/figures/`+id+`.png"></img>`
-	$("#container").html(html)
+	$("#container").html(imageMap(id))
 
 	$("#title").text(figure.title)
 	$("#subtitle").text(figure.subtitle)
 	$("#text").text(figure.text)
+
+	$("#img-"+id).mapster();
+}
+
+function imageMap(id) {
+	let imagemap = FIGURES[id].imagemap
+	let html = `<img id="img-`+id+`" src="assets/figures/`+id+`.png" usemap="#image-map-`+id+`">`
+	html += `<map name="image-map-`+id+`">`
+	imagemap.forEach( map => {
+		if (map.pointsto)
+			html += `<area href="#" coords="`+map.coords+`" shape="`+map.shape+`">`
+		else
+			html += `<area href="#" coords="`+map.coords+`" shape="`+map.shape+`">`
+	})
+	html += "</map>"
+	return html
 }
