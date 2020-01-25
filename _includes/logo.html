@@ -1,7 +1,8 @@
 <!-- Logo -->
 <div id="logo">
-  <a href="{{- '/' | absolute_url -}}" id="home-link">
-    <h1 id="title">{{- page.title -}}</h1>
-    <p>{{- page.subtitle -}}</p>
+  <a href="{{- page.linkto -}}" id="home-link">
+    <span class="image {{ page.icon }}"></span>
   </a>
+  <h1 id="title">{{page.sidebar-title}}</h1>
+  <p>{{page.sidebar-subtitle}}</p>
 </div>

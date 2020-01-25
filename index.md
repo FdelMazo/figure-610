@@ -1,17 +1,30 @@
 ---
 layout: default
+icon: icon-b fa-github
+linkto: https://github.com/FdelMazo/figure-610/
 title: Figure 6.10
-subtitle: Principles of Computer Architecture
+subtitle: Principles of Computer Architecture - Chapters 4, 5 and 6
+sidebar-title: Murdocca
+sidebar-subtitle: Murdocca
 permalink: /
 ---
 
-This Jekyll theme lets you build as many of these sections as you want. They live in the _sections folder in your project's root directory. For some examples, see the [GitHub repository](https://github.com/chrisbobbe/jekyll-theme-prologue). Just be sure to add some [frontmatter](https://jekyllrb.com/docs/frontmatter/) to each section.
+This site will help you visualize a computer's architecture in a clearer way than just reading a book. Every single piece of knowledge present in this site comes from [Miles J. Murdocca's "Principles of Computer Architecture"](http://academicos.azc.uam.mx/oan/lac/Murdocca_en.pdf).
 
-All sections have titles, which are listed in the site's navigation menu. At the top of each section, the section's title will render by default (e.g., Welcome to Jekyll!). If you want it to show something different (see Intro), add **auto-header: none** to your frontmatter, and add your text in a <h2> tag inside a <header> tag outside the frontmatter. You'll want to give each section an **order** parameter, also in the frontmatter, or it won't know where to put itself and will hide. Icons are from [Font Awesome](https://fontawesome.com/icons).
+The title of this site comes from the figure in page 210, which shows in great detail the microarchitecture of the computer. The goal of this site is to have this figure understood __in it's entirety__ by the end of reading everything.
 
-You may notice that this section is written in Markdown -- either Markdown or html works!
+The chapters covered are:
+
+* Chapter 4: Machine Language and Assembly Language
+    
+    This chapter....
+    
+    This is the first level of abstraction, so it is recommended to start here
+
+* Chapter 5: Languages and The Machine
+
+* Chapter 6: Datapath and Control
 
 <footer>
-  <a href="murdocca" class="button scrolly">Magna Aliquam</a>
-  <p>* The title comes from the famous </p>
+  <a href="murdocca" class="button scrolly">Start</a>
 </footer>
