@@ -440,18 +440,18 @@ button,
 	color: #fff !important;
 	text-decoration: none;
 	padding: 0.75em 2.5em 0.75em 2.5em;
-	background-color: #8ebebc;
+	background-color: #E27689;
 	border: 0;
 	cursor: pointer;
 	@include vendor('background-image', ('linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15))'));
 	@include vendor('transition', 'background-color 0.35s ease-in-out');
 
 	&:hover {
-		background-color: #9ececc;
+		background-color: rgb(226, 110, 131);
 	}
 
 	&:active {
-		background-color: #7eaeac;
+		background-color: rgb(230, 105, 128);
 	}
 }
 
@@ -647,7 +647,7 @@ button,
 
 /* Main */
 
-#main {
+.main {
 	margin-left: 375px;
 	> section {
 		text-align: center;
@@ -663,7 +663,7 @@ button,
 	> section, article {
 		margin: 0;
 		overflow: hidden;
-		padding: 4em 0;
+		padding: 2em 0;
 		box-shadow: inset 0 1px 0 0 rgba(0, 0, 0, 0.05), inset 0 0.1em 0.1em 0 rgba(0, 0, 0, 0.025);
 
 		&.dark {
@@ -746,7 +746,7 @@ button,
 
 	/* Main */
 
-		#main {
+		.main {
 			margin-left: 300px;
 		}
 
@@ -758,7 +758,7 @@ button,
 
 	/* Main */
 
-		#main {
+		.main {
 			> section, article {
 				padding: 3em 0;
 			}
@@ -856,7 +856,7 @@ button,
 
 	/* Main */
 
-		#main {
+		.main {
 			margin-left: 20%;
 		}
 
@@ -1005,7 +1005,7 @@ button,
 
 		body {
 			&.header-visible {
-				#main {
+				.main {
 					@include vendor('transform', 'translateX(#{_size(header)})');
 				}
 
@@ -1027,7 +1027,7 @@ button,
 
 	/* Main */
 
-		#main {
+		.main {
 			@include vendor('backface-visibility', 'hidden');
 			@include vendor('transition', 'transform #{_duration(header)} ease');
 			padding-bottom: 1px;
@@ -1078,7 +1078,7 @@ button,
 
 	/* Main */
 
-		#main {
+		.main {
 			> section, article {
 				padding: 2em 0;
 			}
