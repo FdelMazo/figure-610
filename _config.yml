@@ -1,0 +1,4 @@
+baseurl: "/figure-610"
+url: ""
+theme: jekyll-theme-prologue
+collections: [sections]
