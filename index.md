@@ -3,6 +3,7 @@ layout: default
 title: Figure 6.10
 subtitle: Principles of Computer Architecture
 
+texttitle: The site's title
 text: The title of this site comes from the figure in page 210, which shows in great detail the microarchitecture of the computer. The goal of this site is to have this figure understood in it's entirety by the end of reading everything.
 ---
 

@@ -13,6 +13,22 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
+#navigate {
+	float: left;
+}
+
+#text {
+	white-space: pre-wrap;
+}
+
+.nocursor {
+	cursor: default;
+}
+
+.container div {
+	margin: 0 auto;
+}
+
 @import "libs/skel";
 
 @include skel-breakpoints((
@@ -545,10 +561,14 @@ button,
 	}
 
 	h1 {
-		position: relative;
 		color: #fff;
-		font-weight: 600;
 		font-size: 1em;
+		line-height: 1em;
+	}
+
+	h2 {
+		color: #fff;
+		font-size: .8em;
 		line-height: 1em;
 	}
 
