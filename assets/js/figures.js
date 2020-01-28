@@ -53,14 +53,14 @@ let FIGURES = {
       `}
     ],
     "imagemap" : [
-      {"coords" : "59,9,148,97", "shape": "rect", "title": "", "pointsto": "45", "text": `
+      {"coords" : "59,9,148,97", "shape": "rect", "title": "CPU", "pointsto": "45", "text": `
       [EXTRAER UN PARRAFO DE SECCION SIGUIENTE]
       `},
-      {"coords" : "192,7,283,98", "shape": "rect", "title": "", "pointsto": "440", "text": `
+      {"coords" : "192,7,283,98", "shape": "rect", "title": "Memory", "pointsto": "440", "text": `
       [EXTRAER UN PARRAFO DE SECCION SIGUIENTE]
       `},
-      {"coords" : "329,7,418,99", "shape": "rect", "title": "", "pointsto": "", "text": `
-      [EXTRAER UN PARRAFO DE SECCION SIGUIENTE]
+      {"coords" : "329,7,418,99", "shape": "rect", "title": "I/O", "pointsto": "", "text": `
+      [Seccion 4.7]
       `},
       {"coords" : "2,138,45,236", "shape": "rect", "title": "System Bus Model", "pointsto": "", "text": `
       [TEXTO DE SECCIONES 1.2 y 1.3 PARA HABLAR DE VON NEUMAN Y REFINAMIENTO]
@@ -85,6 +85,7 @@ let FIGURES = {
     ],
     "imagemap" : [
       {"coords" : "12,89,145,223", "shape": "rect", "title": "Memory Map", "pointsto": "441", "text": `
+      [EXTRAER TEXTO DE LA SIGUIENTE SECCION]
       `}
     ]
   },
@@ -95,13 +96,14 @@ let FIGURES = {
     "texts": [
       {"title": "Address Space","text": `
       Divided into distinct regions
+      [LLENAR TODA ESTA SECCION CON LO DE 4.1.2]
       `}
     ],
     "imagemap" : [
       {"coords" : "74,48,191,97", "shape": "rect", "title": "OS", "text": ``},
       {"coords" : "190,130,73,98", "shape": "rect", "title": "User Space", "text": ``},
       {"coords" : "74,199,190,248", "shape": "rect", "title": "System Stack", "text": ``},
-      {"coords" : "189,340,74,306", "shape": "rect", "title": "Memory Mapped I/O", "text": `
+      {"coords" : "74,251,191,340", "shape": "rect", "title": "Memory Mapped I/O", "text": `
       [Texto de la seccion de I/O]`},
       {"coords" : "145,354,195,373", "shape": "rect", "title": "Addreses", "text": `
       0 a 2 a la 32 -1
@@ -114,22 +116,15 @@ let FIGURES = {
     "title":"High Level View of a CPU",
     "subtitle":"",
     "texts": [
-      {"title": "Address Space","text": `
-      Divided into distinct regions
+      {"title": "???","text": `
+      [Composed by two distinct sections...]
       `}
     ],
     "imagemap" : [
-      {"coords" : "11,143,135,215", "shape": "rect", "title": "Data Section", "pointsto": "46", "text": `
+      {"coords" : "16,17,131,127", "shape": "rect", "title": "Data Section", "pointsto": "46", "text": `
       The Data section (or datapath) is made up of a collection of registers and the ALU`},
-      {"coords" : "199,146,306,212", "shape": "rect", "title": "Control Section", "text": `
-      The Control section interprets instructions and effects register transfers`},
-      {"coords" : "29,28,117,61", "shape": "rect", "title": "Register File", "text": `
-      The register file can be though of as a small, fast memory, separate from the system memory, which is used for <em>temporary</em> storage during computation
-      Like the system memory, each register is assigned an address. These register addresses are much smaller than main memory ones. A 32 registers file needs only 5-bit addresses (2<sup>5</sup> = 32).
-      As the register file is contained within the CPU, it is much more faster than main memory.
-      `},
-      {"coords" : "29,83,118,116", "shape": "rect", "title": "Arithmetic Logic Unit", "text": ``},
-      {"coords" : "209,26,297,117", "shape": "rect", "title": "Control Unit", "text": `
+      {"coords" : "208,26,297,118", "shape": "rect", "title": "Control Section", "text": `
+      The Control section interprets instructions and effects register transfers and consists only of the control unit.
       The Control unit is responsible for executing the program instructions, which are stored in the main memory.
       `},
       {"coords" : "130,57,207,86", "shape": "rect", "title": "Interface between control unit and data unit", "text": `
@@ -144,24 +139,118 @@ let FIGURES = {
     "title":"Datapath",
     "subtitle":"",
     "texts": [
-      {"title": "Busses","text": `
-      There are several busses inside the datapath which connects it to the system bus, so that data can be transferred to and from the main memory and the register file.
-      There are also three busses which connect the ALU to the register file, which allow two operands to be fetched from the register file (both register sources, rs1 and rs2), which are operated on by the ALU, and then the result is returned to the register file (the destination register, rd).
+      {"title": "???","text": `
+      ???
       `}
     ],
     "imagemap" : [
       {"coords" : "93,49,191,206", "shape": "rect", "title": "Register File", "text": `
+      The register file can be though of as a small, fast memory, separate from the system memory, which is used for <em>temporary</em> storage during computation
+      Like the system memory, each register is assigned an address. These register addresses are much smaller than main memory ones. A 32 registers file needs only 5-bit addresses (2<sup>5</sup> = 32).
+      As the register file is contained within the CPU, it is much more faster than main memory.
       `},
       {"coords" : "262,1,390,49", "shape": "rect", "title": "Source Registers", "text": `
+      Two buses allow operands to be fecthed from the register file, which are then operated on by the ALU.
       `},
       {"coords" : "127,324,269,344", "shape": "rect", "title": "Destination Register", "text": `
+      The result of the ALU operation over the two sources is then returned to the register file.
       `},
       {"coords" : "255,246,315,245,323,256,335,245,391,246,345,294,303,294", "shape": "poly", "title": "Arithmetic Logic Unit", "text": `
       [The alu implements a variety....]
       [Paginas 111 y 112]`},
     ]
-  }
+  },
 
+  610: {
+    "title":"Chapter 6: Datapath and Control",
+    "subtitle":"The famous figure 6.10",
+    "texts": [
+      {"title": "Microarchitecture Level","text": `
+      We now explore the part of the machine that is responsible for implementing the instruction set (ISA) and effects the operations on registers and memory: <strong>The Control Unit</strong>
+      The microarchitecture level consists of the control unit and the programmer-visible registers, functional units (the ALU, and others) and any additional registers that are required.
+      It is one deeper level than the architecture level above it, they are the same units (the control section, the datapath, etc) but seen in a different context: hardwired control, registers and what is actually happening under the hood.
+      The microarchitecture is the one responsble for making the fetch-execute cycle happen.
+      `}
+    ],
+    "imagemap" : [
+      {"coords" : "308,188,484,231", "shape": "rect", "title": "Read Only Memory", "text": ``},
+      {"coords" : "302,305,499,321", "shape": "rect", "title": "Microcode Instruction Register", "text": ``},
+      {"coords" : "313,120,440,158", "shape": "rect", "title": "Control Store Address Mux", "text": ``},
+      {"coords" : "302,49,419,80", "shape": "rect", "title": "Control Store Address Multiplexer", "text": ``},
+      {"coords" : "451,477,525,541", "shape": "rect", "title": "Control Branch Logic", "text": ``},
+      {"coords" : "340,546,407,560", "shape": "rect", "title": "Processor Status Register", "text": ``},
+      {"coords" : "42,490,100,528", "shape": "rect", "title": "C Bus Multiplexer", "text": ``},
+      {"coords" : "96,34,201,259", "shape": "rect", "title": "Scratchpad", "text": ``},
+      {"coords" : "95,262,200,277", "shape": "rect", "title": "Instruction Register", "text": ``},
+      {"coords" : "27,143,81,187", "shape": "rect", "title": "C Multiplexer", "text": ``},
+      {"coords" : "208,68,261,111", "shape": "rect", "title": "A Multiplexer", "text": ``},
+      {"coords" : "232,173,285,216", "shape": "rect", "title": "B Multiplexer", "text": ``},
+      {"coords" : "218,480,232,528,280,529,295,482,272,482,266,497,249,497,242,480", "shape": "poly", "title": "Arithmetic Logic Unit", "text": ``},
+      {"coords" : "84,324,132,354", "shape": "rect", "title": "Clock Unit", "text": ``},
+      {"coords" : "132,611,266,707", "shape": "rect", "title": "Main Memory", "text": ``},
+      {"coords" : "3,1,295,44", "shape": "rect", "pointsto": "63", "title": "Datapath", "text": ``},
+      {"coords" : "298,1,547,43", "shape": "rect", "title": "Control Section", "text": ``},
+    ]
+  },
+
+  63: {
+    "title":"Datapath (microarchitecture)",
+    "subtitle":"",
+    "texts": [
+      {"title": "","text": `
+      `}
+    ],
+    "imagemap" : [
+      {"coords" : "240,610,253,660,303,661,318,613,293,612,288,629,272,627,265,612", "shape": "poly", "pointsto":"65", "title": "Arithmetic Logic Unit", "text": ``},
+      {"coords" : "136,52,204,72", "shape": "rect", "pointsto":"68", "title": "Arithmetic Logic Unit", "text": ``},
+      {"coords" : "133,547,204,567", "shape": "rect", "pointsto":"69", "title": "Arithmetic Logic Unit", "text": ``}
+    ]
+  },
+
+  65: {
+    "title":"Datapath (microarchitecture)",
+    "subtitle":"",
+    "texts": [
+      {"title": "","text": `
+      `}
+    ],
+    "imagemap" : [
+      {"coords" : "72,222,429,280", "shape": "rect", "pointsto":"66", "title": "Arithmetic Logic Unit", "text": ``}
+    ]
+  },
+
+  66: {
+    "title":"Datapath (microarchitecture)",
+    "subtitle":"",
+    "texts": [
+      {"title": "","text": `
+      `}
+    ],
+    "imagemap" : [
+    ]
+  },
+  
+  68: {
+    "title":"Datapath (microarchitecture)",
+    "subtitle":"",
+    "texts": [
+      {"title": "","text": `
+      `}
+    ],
+    "imagemap" : [
+    ]
+  },
+  
+  69: {
+    "title":"Datapath (microarchitecture)",
+    "subtitle":"",
+    "texts": [
+      {"title": "","text": `
+      `}
+    ],
+    "imagemap" : [
+    ]
+  }  
 }
 
 
