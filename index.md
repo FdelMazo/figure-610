@@ -11,6 +11,8 @@ This site will help you visualize a computer's architecture in a clearer way tha
 
 The chapters covered are:
 
+* Chapter 1: Just an introoooo of sections 1.2/3/4
+
 * Chapter 4: Machine Language and Assembly Language
     
     This chapter....
