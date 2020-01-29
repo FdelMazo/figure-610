@@ -62,7 +62,7 @@ function show(title, text) {
 
 function imageMap(id) {
 	let imagemap = FIGURES[id].imagemap
-	let html = `<img id="img-`+id+`" src="assets/figures/`+id+`.png" usemap="#image-map-`+id+`">`
+	let html = `<img class="image" id="img-`+id+`" src="assets/figures/`+id+`.png" usemap="#image-map-`+id+`">`
 	html += `<map name="image-map-`+id+`">`
 	imagemap.forEach( map => {
 		html += `<area onmouseout="showAllTexts(`+id+`)" onmouseover="show(\``+map.title+`\`,\``+map.text+`\`)" href="#" coords="`+map.coords+`" shape="`+map.shape+`"`
