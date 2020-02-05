@@ -69,15 +69,22 @@ let FIGURES = {
     "subtitle":"Figure 4.4",
     "texts": [
       {"title": "Memory","text": `
-      [INCOMPLETE --> FILL WITH SECTION 2.1.4]
-      Bit, byte, word, address
-      <strong>diferencia data e info (address y word)</strong>
+      Computer memory is just a collection of consecutive items which hold one byte, where each of this item has an <strong>address</strong>, by which we reference them. One byte is a collection of 8 bits (and a bit is the little switch that can only be 1 or 0).
       `},
       {"title": "Addresability","text": `
-      word addresable vs byte addresable
+      A machine can be byte-addressable or word-addressable. This means that the smallest object which can be referenced could be either a byte in some machines, or a <strong>word</strong>. A word is just a collection of N bytes, where the N is defined by the processor type. A 32-bit processor has 32-bit words (so, 4 bytes per word), whereas a 64-bit processor has 64-bit words (8 bytes).
       `},
       {"title": "Endiannes","text": `
-      big endian - little endian
+      So, what happens when a byte-addressable machine wants to access a word? How is that word stored?
+
+      Lets say we have the word 0x00000401. 
+      As we are on the hexadecimal system, each pair of numbers is a byte, because each number can be any number between 0 and 16. If we have 2<sup>4</sup>=16 possibilities, we have 4 different bits. So, a pair of numbers are 8 bits, which are one byte.
+      
+      This means, we have the 4-byte word composed by the bytes 00, 00, 04 and 01. When we try to access the whole word, we must do it by addressing it by the <strong>lowest</strong> byte address. 
+      So now the question is, which byte do we place on the lowest address?
+
+      There are two choices: we either store this word as the sequence 00 00 04 01 (that means, presented as it is written), placing its <strong>most significat byte at the lowest address</strong>, referred to as <strong>big-endian</strong>,
+      or we store it as the sequence 01 04 00 00, placing its <strong>least significat byte at the lowest address</strong>, referred to as <strong>little-endian</strong>.
       `}
     ],
     "imagemap" : [
@@ -91,18 +98,23 @@ let FIGURES = {
     "subtitle":"Figure 4.4",
     "texts": [
       {"title": "Address Space","text": `
+      A memory address that is n bits can specify any one of 2<sup>n</sup> items, so the total size of the memory becomes 2<sup>n</sup>.
+      Since addresses are counted in sequence beginning with zero, the highest address is one less than the size of the memory. So, in a 2<sup>32</sup> byte memory (i.e a 4GB memory), the range of addresses goes from 0 to 2<sup>32</sup>-1. 
       `}
     ],
     "imagemap" : [
-      {"coords" : "74,48,191,97", "shape": "rect", "title": "OS", "text": ``},
-      {"coords" : "190,130,73,98", "shape": "rect", "title": "User Space", "text": ``},
-      {"coords" : "74,199,190,248", "shape": "rect", "title": "System Stack", "text": ``},
-      {"coords" : "74,251,191,340", "shape": "rect", "title": "Memory Mapped I/O", "text": `
-      The method for interacting with I/O devices is through the use of <strong>memory mapped I/O</strong>, in which devices occupy sections of the address space where no ordinary memory exists and are accessed as if they are memory locations.
+      {"coords" : "74,48,191,97", "shape": "rect", "title": "OS", "text": `
+      The lowest 2<sup>11</sup>=2048 addresses are reserved for use by the operating system.
       `},
-      {"coords" : "145,354,195,373", "shape": "rect", "title": "Addreses", "text": `
-      0 a 2 a la 32 -1
-      a memory address that is n bits wide..
+      {"coords" : "190,130,73,98", "shape": "rect", "title": "User Space", "text": `
+      The user space is where a user's assembled program is loaded and can grow during operation, until it meets up with the system stack.
+      `},
+      {"coords" : "74,199,190,248", "shape": "rect", "title": "System Stack", "text": `
+      The system stack starts at location 2<sup>31</sup>-4 and grows toward lower addresses.
+      `},
+      {"coords" : "74,251,191,340", "shape": "rect", "title": "Memory Mapped I/O", "text": `
+      
+      The method for interacting with I/O devices is through the use of <strong>memory mapped I/O</strong>, in which devices occupy sections of the address space between 2<sup>31</sup> and 2<sup>32</sup>-1 and are read and written as if they are memory locations.
       `}
     ]
   },
@@ -180,7 +192,7 @@ let FIGURES = {
       The heart of the control unit.
       This ROM contains values for all of the lines that must be controlled to implement each user-level instruction.
       `},
-      {"coords" : "302,305,499,321", "shape": "rect", "pointsto": "611", "title": "", "text": ``},
+      {"coords" : "302,305,499,321", "shape": "rect", "pointsto": "611", "title": "Microprogram Instruction Register", "text": ``},
       {"coords" : "84,324,132,354", "shape": "rect", "title": "Timing", "text": `
       The microarchitecture operates on a two-phase clock cycle. The master section of all the registers (which are falling edge-triggered master/slave D flip-flops) change on the rising edge of the clock, and the slave sections change on the falling edge. 
       On the <strong>falling edge</strong>, data stored in the master sections of the registers are clocked into the slave sections. This makes the data available for operations involving the ALU. 
@@ -294,11 +306,11 @@ let FIGURES = {
       The CLK input to the register is ANDed with the select line (c<sub>1</sub>) from the C decoder.
       This ensures that the register only changes when the control section instructs it to change.
       `},
-      {"coords" : "67,7,241,44", "shape": "rect", "title": "Control Section", "text": `
+      {"coords" : "67,7,241,44", "shape": "rect", "title": "Inputs", "text": `
       The data inputs to the register are taken directly from the corresponding lines of the C bus.
       `},
-      {"coords" : "110,215,286,257", "shape": "rect", "title": "Control Section", "text": `
-      The outputs are written to the corresponding lines of the A and B busses through tri-state buffers, which are "electrically disconnected" unless their enable inputs are set to 1. The outputs of the buffers are enabled onto the A and B busses by the a<sub>1</sub> and b<sub>1</sub> outputs of the A and B decoders. If neither a<sub>1</sub> nor b<sub>1</sub> are equal to 1, then the outputs are electrically disconnected from both the A and B buseses since the tri-state buffers are disabled.    
+      {"coords" : "110,215,286,257", "shape": "rect", "title": "Outputs", "text": `
+      The outputs are written to the corresponding lines of the A and B busses through tri-state buffers, which are 'electrically disconnected' unless their enable inputs are set to 1. The outputs of the buffers are enabled onto the A and B busses by the a<sub>1</sub> and b<sub>1</sub> outputs of the A and B decoders. If neither a<sub>1</sub> nor b<sub>1</sub> are equal to 1, then the outputs are electrically disconnected from both the A and B buseses since the tri-state buffers are disabled.    
       `}
     ]
   },
