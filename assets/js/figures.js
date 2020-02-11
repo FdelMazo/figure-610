@@ -191,10 +191,13 @@ let FIGURES = {
     "subtitle":"The Famous Figure 6.10",
     "texts": [
       {"title": "Microarchitecture Level","text": `
-      The microarchitecture is one level deeper than the architecture, and it is composed of the same units (the control section, the datapath) but seen in a different context: hardwired control, registers and what is actually happening under the hood.
+      The microarchitecture is one level deeper than the architecture, and is composed of the same units (the control section, the datapath) but seen in a different context: hardwired control, registers and what is actually happening under the hood.
+      
       It consists of the control unit and the programmer-visible registers, functional units (the ALU, and others) and any additional registers that are required, and is the one responsible for actually making the fetch-execute cycle happen.
 
       The general idea is that the Control Section is the one responsible for <em>selecting</em> the microinstruction to be executed, while the Data Section is the one responsible for actually <em>executing</em> it.
+
+      When the microarchitecture begins operation (at boot), a reset circuit places the microword at location 0 in the control store into the MIR and executes it. From there on, the fetch-execute cycle starts, and each unit viewed at its level does its job in order for the cycle to continue.
       `}
     ],
 
@@ -202,77 +205,164 @@ let FIGURES = {
     "imagemap" : [
       {"coords" : "308,188,484,231", "shape": "rect", "title": "Read Only Memory", "text": `
       This <strong>Control Store</strong> is the heart of the control unit.
-      This ROM contains values for all of the lines that must be controlled to implement each user-level instruction.
-      This lines are the 41-bit <strong>microinstructions</strong>.
+      
+      This <strong>read-only</strong> memory(ROM) contains values for all of the <strong>microinstructions</strong> that can be executed at the microarchitecture level.
+
+      There are 2048 possible microinstructions, so their address are 11 bit long, and each one of them is 41-bit long.
+
+      The only <strong>input</strong> this unit has is the 11-bit address it receives from the Control Store Address Multiplexer, which has the responsibility for selecting the instruction to be executed.
+
+      The function of this unit is to get the 41-bit microinstruction referenced by the address received, and placing it on the Microcode Instruction Register.
+
+      The only <strong>output</strong> of this unit is the 41 bits which are feeded to the MIR.
       `},
       {"coords" : "302,305,499,321", "shape": "rect", "pointsto": "611", "title": "Microprogram Instruction Register", "text": `
-      The MIR is where the microinstruction is placed. 
-      This microinstruction is a 41-bit word divided into 11 fields which define the different important things a microinstruction needs, such as the JUMP address if a jump is to be made, the operands when adding two numbers, etc.
+      The MIR is where the microinstruction is placed. The purpose of this register is to derivate each bit to its correct place all over the machine.
 
-      When the microarchitecture begins operation (at boot), a reset circuit places the microword at location 0 in the control store into the MIR and executes it.
-      Then, a microword is selected for execution from the Next/Decode/Jump inputs to the CS Address Mux, according to the settings in the COND field of the MIR and the output of the CBL logic.
-      After each microword is placed in the MIR, the datapath performs operations (in the ALU) according to the settings in the individual fields of the MIR.
+      This microinstruction is a 41-bit word divided into 11 fields which define the different important things a microinstruction needs (such as the operands when adding two numbers, or the JUMP address if a jump is to be made).
 
-      The MIR <strong>inputs</strong> are only the clock unit (so that the MIR updates on each clock cycle) and the ROM which contains every instruction, so that the instruction can be placed on it.
+      The MIR <strong>inputs</strong> are only the clock unit (so that the MIR updates on each clock cycle) and the 41-bit instruction that comes from the ROM.
 
-      The MIR <strong>outputs</strong> are each field out of the 11 in the instruction and are scattered all over the CPU and specified on each unit.  
+      The MIR <strong>outputs</strong> are each field in the instruction and are scattered all over the CPU:
+
+      First of all, there are A, B and C 6-bit fields which represent the registers on which the microinstruction will operate, if necessary. This are both the sources of the instruction (A and B), and the destination of it (C). This fields are 6 bit long, as one out of 38 registers can be selected. This fields are passed onto the A, B and C Multiplexers, which will then decide if the A, B and C registers the datapath will operate on come from the MIR, or anywhere else. For this decision to be made by the multiplexer, this MUXs need one more bit: the A/B/C MUX field. This field is set when an instruction operates on the registers.
+
+      After the first 21 most significant bits of the MIR comes the RD and WR fields. This one bit fields are feeded to main memory, and are set when a load or store operation takes place. This is because this machine only allows reading and writing from main memory on specific instructions. The RD line also controls the 64-to-32 C Bus Mux, which is in charge of determining whether the destination of the operation, that is, where the result will be written, is the result from the operation, or is loaded from the main memory.
+
+      Then, the ALU 4-bit field refers to one of 16 possible ALU operations to be performed, and is feeded to the ALU to actually perform it. After this field comes the 3-bit COND field, which instructions from where to take the next microword: either from the literal NEXT location in the ROM, or from the JUMP ADDR field, or from the opcode bits in the instruction register. This COND field is feeded to the Control Branch Logic unit, which is in charge of the logic of determining the next microword out of this different conditions.
+
+      Finally, there is the 11-bit address in the JUMP ADDR field, which goes directly to the Address Multiplexer, as for the case in which the COND field indicated that a jump must be made, so that there is a direct jump to that particular address.
+
       `},
       {"coords" : "84,324,132,354", "shape": "rect", "title": "Timing", "text": `
       The microarchitecture operates on a two-phase clock cycle. The master section of all the registers (which are falling edge-triggered master/slave D flip-flops) change on the rising edge of the clock, and the slave sections change on the falling edge. 
+      
       On the <strong>falling edge</strong>, data stored in the master sections of the registers are clocked into the slave sections. This makes the data available for operations involving the ALU. 
       While the clock is low, the ALU, CBL and MUX functions are perfomed (and the condition code flags are become stable), which settle in time for the rising edge of the clock. 
+      
       On the <strong>rising edge</strong> of the clock, the new values of the registers are written into the master sections. 
       The registers settle while the clock is high, and the process repeat.`},
-      {"coords" : "3,1,295,44", "shape": "rect", "pointsto": "63", "title": "Datapath", "text": `
-      The datapath consists of The ALU, the register file with 38 data registers, and the A, B and C decoders.
+      {"coords" : "3,1,295,44", "shape": "rect", "title": "Datapath", "text": `
+      The purpose of the datapath is to actually perform the microinstruction over the data inside the registers.
       `},
       {"coords" : "298,1,547,43", "shape": "rect", "title": "Control Section", "text": `
-      We now explore the part of the machine that is responsible for implementing the instruction set (ISA), and effects the operations on registers and memory: <strong>The Control Unit.</strong>
+      We now explore the part of the machine that is responsible for implementing the instruction set (ISA), and effects the operations on registers and memory. The control section consists solely of <strong>The Control Unit</strong>.
 
-      The whole purpose of the control section is to get the actual correct microinstruction in the MIR, which will be then feeded to the datapath and will actually perform the operation in it.
+      The whole purpose of the control section is to get the actual correct microinstruction in the MIR, which will be then feeded to the data section, which will actually perform the operation in it.
       
-      The execution of each microinstrucion is controlled by the microprogram instruction register, the processor status register, and a mechanism for determining the next microinstruction to be executed. As the microinstruction is recomputed on every clock cycle, it does not need to be stored.
+      The execution of each microinstrucion is controlled by the microprogram instruction register, the processor status register, and a mechanism for determining the next microinstruction to be executed. 
+      As the microinstruction is recomputed on every clock cycle, it does not need to be stored.
       `},
       {"coords" : "276,536,294,556", "shape": "rect", "title": "Wires", "text": `
       This indicates the number of separate wires that are represented in the line, which equals to the number of bits being passed.
-      For example, as the psr needs 4 bits from the ALU, so there are 4 separate wires connecting them.
+      For example, as the %psr needs 4 bits from the ALU, so there are 4 separate wires connecting them.
       `},
       {"coords" : "313,120,440,159", "shape": "rect", "title": "Control Store Address MUX", "text": `
-      This multiplexer has the responsibility of selecting (but not deciding!) the control store microinstruction to be executed according.
+      This multiplexer has the responsibility of selecting (but not deciding!) the control store microinstruction to be executed, and passing it on to the actual Control Store. There are three possible scenarios: get the NEXT instruction, DECODE an instruction, or JUMP to a specific address.
+      
+      This unit has several <strong>inputs</strong>. First of all, there is a 2-bit control input from the Control Branch Logic (which decided what will happen). Then, there is an 11-bit address from the JUMP field inside the MIR (as to jump to that instruction, if necessary), an 11-bit address from the Incrementer (for a NEXT operation), and finally, an 8-bit opcode coming from the IR (needed for a DECODE operation).
+      
+      If the <strong>NEXT</strong> instruction will be taken, then a unit should decide which is the next instruction. But this is not as simple as incrementing the current instruction by one, because read and write operations from main memory have unpredictable timing. This is why the Control Store Address Incrementer exists, a unit which sole purpose is to increment this unit's current output. 
 
-      This unit has several inputs. First of all, there are the two bits of the Control Branch Logic (which decided what will happen next), which tells it to get either the NEXT instruction, DECODE an instruction from the MIR, or JUMP to the address in the MIR.
+      That is, the CS Address Mux is on instruction 1045 and it received the command from the CBL to get the NEXT instruction, then it sends 11 bits (any of the 2048 instructions are possible) to the CSAI, which takes this 1045, adds it one, and now sends back the 11 bits with 1046 again to the CS Address Mux.
 
-      If the NEXT instruction will be taken, then a unit should decide which is the next instruction. This is why the Control Store Address Incrementer exists, a unit which sole purpose is to increment this units current output by one. 
-      That is, the CS Add Mux is on instruction 1045 and it received the command to get the NEXT instruction, then it sends 11 bits (any of the 2048 instructions is possible) to the CSAI, which takes this 1045, adds it one, and now sends back the 11 bits with 1046 again to the CS Address Mux, which will then go on and execute it.
+      If a <strong>DECODE</strong> is to be done, then the instruction comes from the ISA level, as it was selected by the user. So, the instruction in the IR  must be transformed into a microinstruction for the MIR.
 
-      If a DECODE is to be done, then the instruction in the IR should be decoded and executed. That is, any instruction in the IR is designed an specific op code. For example, an add instruction has the arithmetic format (op=10) and its specific op code (which is called either op2 or op3) is 010000. All of this bits are inside the IR, and they serve as an input to the CS Addr Mux. With this opcodes, and a little bit of logic, the DECODE step gets from the possible instructions an address for the microinstruction to be executed.
+      This decoding must transform the 8-bit unique opcode (in the ops field of the IR) into an 11-bit address. With little bit of logic (adding 1s and 0s here and there), the DECODE step gets from the possible instructions an address for the microinstruction to be executed.
 
-      Finally, if a JUMP is to be done, then the CS Add Mux must know which is the JUMP address to go to! For this, it needs a direct connection to the MIR. The 11 bit JUMP ADDR field of the MIR serves as the input for this unit.
+      Finally, if a <strong>JUMP</strong> is to be done, then the microinstruction comes from the MIR itself. Here there is no decoding needed, as we already have our 11-bit address to jump to.
 
-      Whichever step is to be taken, this must be communicated to the Control Store. That is why this unit's only output is the 11 bits of the next instruction to be executed.
+      The only <strong>output</strong of this unit is simply the 11-bit address of the next microinstruction to execute, which is feeded to the Control Store.
       `},
       {"coords" : "452,477,525,540", "shape": "rect", "title": "Control Branch Logic", "text": `
-      The CBL is a middleman between the MIR and the CS Address Mux, and it decides whether the next instruction to be executed should be literally the next instruction in the control store, should be decoded from the IR (not the MIR!) or should be a direct JUMP to the JUMP ADDR in the MIR.
+      The CBL is the middleman between the instructions and the CS Address Mux. Is the first step in deciding which will be the next instruction, with the second and final step being done in the CS Address Multiplexer. 
+      
+      This unit decides whether the next instruction to be executed should be literally the next microinstruction in the control store, should be decoded from the IR (not the MIR!) or should be a direct JUMP to the JUMP ADDR in the MIR.
 
-      This is because there are several branch instructions such as branch if equal to zero (be) or branch if the result is negative (bneg), but the logic that checks if the conditions are met is complicated in a way that it requires a unit all to itself to apply it.
+      This unit is necessary in particular because of the several branch instructions that exist at user level, such as branch if equal to zero (be) or branch if the result is negative (bneg). The logic that checks if the different conditions are met is complicated in a way that it requires a unit all to itself to apply it.
 
-      The MIR, in the COND field, decides what will happen next: get the NEXT instruction address, DECODE the instruction from the IR, or JUMP according to several conditions.
+      This unit has several <strong>inputs</strong>:
+      
+      The first input is the 3-bit COND field of the MIR, which instructs from where to take the next instruction: get the NEXT instruction address in the ROM control store, DECODE the instruction from the IR, or JUMP to the address specified by the MIR according to the different branching conditions.
 
-      Then, the CBL checks if this conditions are met. For this to happen, it needs inputs from the COND field of the MIR (as to know what was instructed) and the four condition codes in the psr (as to know if the flags such as n or z are set to 1 or 0).
+      Another input for this unit is the sole thirteenth bit in the instruction register. This bit serves as a condition for the next microinstruction to be executed. This is because we are at such low level that each microinstruction is very specific, and there is a real difference between calling, for example, an addition between two registers (one microinstruction in the ROM) or an addition between a register and a literal integer.
+      
+      Finally, the last input for this unit are the four condition codes (n, z, v, c) in the %psr, which indicate the different arithmetic flags of the operation's result.
 
-      Besides branching if the condition codes are set, another jump can be taken if the 13 bit of the IR is set. This is because several instructions have more than one way to be written. For example, one could either make an add betwen two registers, or it could do it between a register and a literal integer. As this are two separate microinstructions, when a literal integer is used, the 13th bit of the IR is set, and a JUMP must be made. It is because of this that the CBL needs another input: the 13th bit of the IR.
+      With all of this inputs, the CBL applies the logic and resolves which one of the three scenario takes place: either take the next instruction, decode it, or jump according to one of the five possible conditions. 
+      
+      The <strong>output</strong> of this unit is the options out of the three possible one. One of three numbers is encoded in 2 bits. This 2 bits are feeded to the CS Address Multiplexer, which will determine the actual microinstruction to take place, whereas this unit only decided from where to take it.
+      `},
+      {"coords" : "208,69,261,113", "shape": "rect", "title": "Multiplexers", "text": `
+      The A, B and C multiplexers purpose is to decide the source from where to select the register.
+          
+      The idea behind this is to either select a register from the microarchitecture (internal) level, taking one of 38 possible registers from the MIR, or to select a register from the ISA user level, taking one of 32 possible (user visible) registers from the IR.
 
-      After the logic was applied there are three possible scenarios, either take the next instruction, decode it, or jump. This 3 options (2 bits) are the output that the CBL gives to the CS Address Mux.
+      The decoders <strong>input</strong> depend on if a user instruction takes place, or an internal microinstruction does.
+      
+      From the microarchitecture level, the inputs come from the Control Section. This are the 6-bit A, B and C fields of the MIR, which correspond to any number between 0 and 37 and the one-bit AMUX/BMUX/CMUX field, which is set when the selection will take place at this level.
+      
+      From the architecture level, the inputs come from the register file itself, as the instruction is inside the %ir. This are the 5-bit rs1, rs2 fields, or the rd field in the case of C. 
+
+      If the AMUX field is set, then the register to be selected will be the A field of the MIR. But if the AMUX field is 0, then the register to be placed on the A bus is the rs1.
+
+      The same thing happens with the BMUX field, the B bus and the rs2 field, and with the CMUX field, the C bus and the rd field.
+
+      The <strong>output</strong> of the MUX is simply the 6-bit register to be selected, which is feeded into the corresponding decoder (inside the scratchpad) which will then decode this 6 bits into a series of 38 bits.
       `},
-      {"coords" : "208,69,261,111", "shape": "rect", "title": "", "text": `
+      {"coords" : "132,611,266,706", "shape": "rect", "title": "Main Memory", "text": `
+      Even though the main memory of a machine is a whole different subject, a broad overview of it is needed at this level, because of the role it takes on the fetch-execute cycle.
+
+      When an instruction needs an operand from main memory, this must be accessed.
+
+      This machine is a <strong>load-store</strong> machine: Only allowable memory access operations can load or store a value into or from one of the registers. This means that every arithmetic or logic function must operate on values contained <em>in</em> registers, and the results are also placed in a register.
+
+      The <strong>inputs</strong> of the memory are the RD and WR bits that come from the MIR, which indicate that a read or write instruction is taking place. 
+      
+      The A, B busses also serve as inputs for the memory, as this busses contain the operands of the instruction and one possible scenario is having a memory address as an operand.
+
+      The <strong>outputs</strong> of the memory are the data retrieved from memory, which goes to the C Bus Multiplexer (and from there will go to the C Bus to be stored at the destination register), and an acknowledge bit which signals the Address Mux that the memory access has been completed, so that the control store can continue with its usual cycle.
+      
       `},
-      {"coords" : "132,611,266,706", "shape": "rect", "title": "", "text": `
+      {"coords" : "96,33,200,258", "shape": "rect", "pointsto": "63", "title": "Scratchpad", "text": `
+      (This link goes to a view of not only the register scratchpad, but also the ALU, the A/B/C decoders and the clock unit)
+
+      The scratchpad memory is a high-speed internal memory used for a temporary storage of the different datapath operations, and is placed really closed to the ALU. Similar to an actual scrathpad, this pad is both small in size and serves for quick calculations. This high-speed access is key for having a usable machine: small items of data can be stored and retreived rapidly in the registers so that the operations are performed quickly.
       `},
-      {"coords" : "96,34,201,278", "shape": "rect", "title": "", "text": `
+      {"coords" : "96,260,200,278", "shape": "rect", "pointsto": "69", "title": "Instruction Register", "text": `
+      The 32-bit instruction register contains the user-level instruction to be executed. It is divided in several fields, and this depend on the actual instruction, as different instruction have different formats (an arithmetic instruction is different from a memory one).
+
+      The <strong>outputs</strong> of this register are the different fields in it and are scattered throughout the whole processor. 
+      
+      There are the fields representing the source and destination registers, which are one out of 32 possible ones (at user level). This 5-bit fields are feeded into the A, B and C decoders so that the register selection can take place.
+
+      There are also the 8-bit op codes which symbolize the instruction selected. This unique operation codes are needed by the Address Mux so that they are decoded and transformed into the actual microinstruction that takes place.
+      
+      Finally, the thirteenth bit in the register is an important one, as it symbolizes if the instruction has two registers as their operands, or if the operation uses an integer. This bit (set when a literal number is an operand) is feeded to the Control Branch Logic which will apply the neccesary jump.
       `},
-      {"coords" : "339,546,407,561", "shape": "rect", "title": "", "text": `
+      {"coords" : "339,546,407,561", "shape": "rect", "title": "Processor Status Register", "text": `
+      This special register contains information about the state of the processor, including information about the results of the arithmetic operations. 
+      
+      The arithmetic flags are called condition codes, and they specify whether an ALU operation which set the condition codes (the ones ending on CC, such as ADDCC) resulted in a zero value (flag z), a negative value (n), a carry out from the result (c) or when the result is too large to be handled (v).
+
+      The <strong>inputs</strong> for this register is the clock unit (as all registers are implemented in a two-phase cycle flip flop, they all need the CLK), the four flags set by the ALU in relation to the operation's result, and a signal from the ALU which indicates this register to update the bits.
+
+      This register merely contains the condition codes and has no calculation whatsoever. The register is 32 bits long (as all registers are), and the n, z, v and c flags correspond to the bits 23 to 20, respectively.
+
+      This unit <strong>output</strong> are the updated condition codes, and are feeded onto the Control Branch Logic, which is the unit in charge of determining the next instruction taking into account the codes.
       `},
-      {"coords" : "303,49,420,80", "shape": "rect", "title": "", "text": `
+      {"coords" : "303,49,420,80", "shape": "rect", "title": "Control Store Address Incrementer", "text": `
+      The CSAI has only one purpose: increment by one an instruction.
+
+      Its <strong>inputs</strong> are the instruction being executed, which comes from the CS Address Multiplexer, and an ACK bit from main memory.
+
+      The ACK bit is a signal which is sent by the main memory to acknowledge that the memory has completed its operation. This is because memory access time is variable (it depends on the memory organization) and usually takes more time to complete than the time required for one microinstruction to execute. As it is impossible to predict when a read or write will end, until the signal is not received, the CSAI does not increment the address.
+
+      Then, the CSAI simply adds one to the instruction received.
+
+      Keep in mind, this unit only operates when the Address Mux received a NEXT instruction. In the case of a DECODE or JUMP, this unit is not called.
+      
+      The <strong>output</strong> is the new instruction to be executed, which is feeded to the Address Mux.
       `}
     ]
   },
@@ -327,7 +417,7 @@ let FIGURES = {
 
       Any number above 37 is free to be used when no register are to be connected to a bus (as they do not correspond to any register).
       `},
-      {"coords" : "136,547,204,567", "shape": "rect", "pointsto":"69", "title": "Register %ir", "text": `This register holds the current instruction that is being executed and <strong>is not visible to the user</strong>.
+      {"coords" : "136,547,204,567", "shape": "rect", "title": "Register %ir", "text": `This register holds the current instruction that is being executed and <strong>is not visible to the user</strong>.
       
       This register has more outputs than the general purpose registers: 24 out of its 32 bits go directly to the control unit.
       `},
@@ -476,20 +566,24 @@ let FIGURES = {
     ],
     "imagemap" : [
       {"coords" : "55,75,121,113", "shape": "rect", "title": "", "text": `
-      The A, B and C fields determine which of the registers are placed at the A, B or C busses. As there are 38 possible registers (remember, we are at microarchitecture level, so not only are the 32 general-purpose user-visible registers available, but also the four temporary ones, the %ir and the %pc), 6 bits are needed to select each one of them.
-      `},
-      {"coords" : "123,74,133,114", "shape": "rect", "title": "", "text": `
-      The AMUX, BMUX and CMUX one-bit fields select whether the A/B/C decoder take the input (or write the output in the case of C) from the field of the MIR or from the %rs1/2/d field of %ir.
+      The A, B and C fields determine which of the registers are placed at the A, B or C busses. 
+      
+      As there are 38 possible registers (remember, we are at microarchitecture level, so not only are the 32 general-purpose user-visible registers available, but also the four temporary ones, the %ir and the %pc), 6 bits are needed to select each one of them.
 
       Since %r0 cannot be changed, the bit pattern 00000 can be used in the C field when none of the registers are to be changed.
       `},
+      {"coords" : "123,74,133,114", "shape": "rect", "title": "", "text": `
+      The AMUX, BMUX and CMUX one-bit fields are set if the sources/destination of the operation comes from the MIR.
+      `},
       {"coords" : "291,75,313,113", "shape": "rect", "title": "", "text": `
-      The RD and WR bits determine wheter memory will be read or written. Both cannot be set to 1 at the same time. The address to be read/written is taken directly from the A bus, the data input from the B bus, and the output is placed on the C bus.
-      
-      The RD line controls the 64-to-32 C Bus MUX which determines wheter the C bus is loaded from the memory or from the ALU.
+      The RD and WR bits determine whether memory will be read or written. Both cannot be set to 1 at the same time.       
       `},
       {"coords" : "314,74,357,114", "shape": "rect", "title": "", "text": `
-      The ALU field determines which of the ALU operations is performed. As there are 16 possible operations, 4 bits are needed. The ALU cannot be turned off when it is not needed (such as in a read or write from memory), so an instruction without side effects is needed to put in place (for example, AND instead of ANDCC which changes the condition codes).
+      The ALU field determines which of the ALU operations is performed. 
+      
+      As there are 16 possible operations, 4 bits are needed. 
+      
+      The ALU cannot be turned off when it is not needed (such as in a read or write from memory), so an instruction without side effects is needed to put in place when this happens. For example, an AND operation (but not an ANDCC, which has the side effect of changing the condition codes).
       `},
       {"coords" : "359,74,392,113", "shape": "rect", "title": "", "text": `
       The COND field instructs the microcontroller to take the next microword from the control store location or from the JUMP ADDR of the MIR, or from the opcode bits of the %ir.
