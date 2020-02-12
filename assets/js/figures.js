@@ -241,7 +241,7 @@ let FIGURES = {
       While the clock is low, the ALU, CBL and MUX functions are perfomed (and the condition code flags are become stable), which settle in time for the rising edge of the clock. 
       
       On the <strong>rising edge</strong> of the clock, the new values of the registers are written into the master sections. 
-      The registers settle while the clock is high, and the process repeat.`},
+      The registers settle while the clock is high, and the process repeats.`},
       {"coords" : "3,1,295,44", "shape": "rect", "title": "Datapath", "text": `
       The purpose of the datapath is to actually perform the microinstruction over the data inside the registers.
       `},
