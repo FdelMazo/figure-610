@@ -300,11 +300,11 @@ let FIGURES = {
 
       The decoders <strong>input</strong> depend on if a user instruction takes place, or an internal microinstruction does.
       
-      From the microarchitecture level, the inputs come from the Control Section. This are the 6-bit A, B and C fields of the MIR, which correspond to any number between 0 and 37 and the one-bit AMUX/BMUX/CMUX field, which is set when the selection will take place at this level.
+      From the microarchitecture level, the inputs come from the Control Section. This are the 6-bit A, B and C fields of the MIR, which correspond to any number between 0 and 37 and the one-bit AMUX/BMUX/CMUX field, which is unset when the selection will take place at this level.
       
       From the architecture level, the inputs come from the register file itself, as the instruction is inside the %ir. This are the 5-bit rs1, rs2 fields, or the rd field in the case of C. 
 
-      If the AMUX field is set, then the register to be selected will be the A field of the MIR. But if the AMUX field is 0, then the register to be placed on the A bus is the rs1.
+      If the AMUX field is 0, then the register to be selected will be the A field of the MIR. But if the AMUX field is 1, then the register to be placed on the A bus is the rs1.
 
       The same thing happens with the BMUX field, the B bus and the rs2 field, and with the CMUX field, the C bus and the rd field.
 
@@ -419,7 +419,7 @@ let FIGURES = {
       `},
       {"coords" : "136,547,204,567", "shape": "rect", "title": "Register %ir", "text": `This register holds the current instruction that is being executed and <strong>is not visible to the user</strong>.
       
-      This register has more outputs than the general purpose registers: 24 out of its 32 bits go directly to the control unit.
+      This register has more outputs than the general purpose registers, and this are directed at the control unit.
       `},
       {"coords" : "136,28,206,48", "shape": "rect", "title": "Register %r0", "text": `This register always contains the value 0 and cannot be changed, thus it has no inputs from the C bus nor any inputs from the C decoder, and does not need flip-flops.`},
       {"coords" : "136,423,204,442", "shape": "rect", "title": "Register %pc", "text": `This register keeps track of the next instruction to be read.
@@ -469,9 +469,9 @@ let FIGURES = {
       Finally, the Barrel Shifter <strong>output</strong> is the result of the operation, and therefore the main (but not only) output of the ALU: The 32-bit data output C. This result is then used by the ALU to set (if necessary) the condition codes.
       `},
       {"coords" : "73,70,130,128", "shape": "rect", "title": "Arithmetic and Logic Functions", "text": `
-      The LUT <strong>inputs</strong> are only one bit of each ALU data input (the 32-bit A and B), the full 4-bit control input F (to look the operation up in the table), and the carry out of its right LUT, which serves as the carry into for the operation (in the case of the first LUT, the carry into is set to 0). 
+      The LUT <strong>inputs</strong> are only one bit of each ALU data input (the 32-bit A and B), the full 4-bit control input F (to look the operation up in the truth table), and the carry out of its right LUT, which serves as the carry into for the operation (in the case of the first LUT, the carry into is set to 0). 
       
-      This LUT resolves the operations by looking the bit combination in the table itself (where each 2-bit binary operation such as an AND between a 1 and a 0 is explicitly detailed).
+      This LUT resolves the operations by looking the bit combination in the truth table (where each 2-bit binary operation such as an AND between a 1 and a 0 is explicitly detailed).
       
       The LUT <strong>outputs</strong> is simply the result of the operation. This are both the result itself (the z bit, not to be confused with zero) which will be feeded to the barrel shifter and the carry out of the operation, which will be useful for the LUT at its left.
       `},
@@ -573,7 +573,7 @@ let FIGURES = {
       Since %r0 cannot be changed, the bit pattern 00000 can be used in the C field when none of the registers are to be changed.
       `},
       {"coords" : "123,74,133,114", "shape": "rect", "title": "", "text": `
-      The AMUX, BMUX and CMUX one-bit fields are set if the sources/destination of the operation comes from the MIR.
+      The AMUX, BMUX and CMUX one-bit fields are set if the sources/destination of the operation comes from the IR.
       `},
       {"coords" : "291,75,313,113", "shape": "rect", "title": "", "text": `
       The RD and WR bits determine whether memory will be read or written. Both cannot be set to 1 at the same time.       
