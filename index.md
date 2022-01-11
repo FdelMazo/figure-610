@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Figure 6.10
+title: Figure 6.10 · fede.dm
 subtitle: Principles of Computer Architecture
 ---
 
