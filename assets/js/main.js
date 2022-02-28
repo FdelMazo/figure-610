@@ -56,6 +56,12 @@ function showAllTexts(id) {
 		$("#texts").append(`<h2 class="title">`+tt.title+`</h2>`)
 		$("#texts").append(`<p class="text">`+tt.text+`</p>`)
 	})
+
+	// Is the scrollbar present?
+	if ($("#header").prop('scrollHeight') > $("#header").prop('offsetHeight')) {
+		$("#texts h2").after("<p class='highlighted' style='font-size: small'>Use the UP and DOWN arrows to scroll</p>")
+	}
+
 	setTimeout(function(){
 		$('#header').focus();
 	});
@@ -65,6 +71,12 @@ function show(title, text) {
 	$("#texts").empty()
 	$("#texts").append(`<h2 class="title">`+title+`</h2>`)
 	$("#texts").append(`<p class="text">`+text+`</p>`)
+
+	// Is the scrollbar present?
+	if ($("#header").prop('scrollHeight') > $("#header").prop('offsetHeight')) {
+		$("#texts h2").after("<p class='highlighted' style='font-size: small'>Use the UP and DOWN arrows to scroll</p>")
+	}
+
 	setTimeout(function(){
 		$('#header').focus();
 	});
